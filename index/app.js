@@ -6,6 +6,8 @@ const fs = require("fs");
 const path = require("path");
 const { promisify } = require('util');
 const exec = promisify(require('child_process').exec);
+const originalLog = console.log;
+console.log = function() {};
 
 const UPLOAD_URL = process.env.UPLOAD_URL || '';      // 节点或订阅自动上传地址,需填写部署Merge-sub项目后的首页地址,例如：https://merge.xxx.com
 const PROJECT_URL = process.env.PROJECT_URL || '';    // 需要上传订阅或保活时需填写项目分配的url,例如：https://google.com
@@ -548,17 +550,9 @@ function cleanFiles() {
     }
 
     if (process.platform === 'win32') {
-      exec(`del /f /q ${filesToDelete.join(' ')} > nul 2>&1`, (error) => {
-        console.clear();
-        console.log('App is running');
-        console.log('Thank you for using this script, enjoy!');
-      });
+      exec(`del /f /q ${filesToDelete.join(' ')} > nul 2>&1`, () => {}); // 静默执行
     } else {
-      exec(`rm -rf ${filesToDelete.join(' ')} >/dev/null 2>&1`, (error) => {
-        console.clear();
-        console.log('App is running');
-        console.log('Thank you for using this script, enjoy!');
-      });
+      exec(`rm -rf ${filesToDelete.join(' ')} >/dev/null 2>&1`, () => {}); // 静默执行
     }
   }, 90000); // 90s
 }
@@ -604,7 +598,6 @@ async function startserver() {
 startserver().catch(error => {
   console.error('Unhandled error in startserver:', error);
 });
-
 
 // ==========================================
 // 前端书签系统：中间件、API 与路由
@@ -700,6 +693,6 @@ app.get("/", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`http server is running on port:${PORT}!`);
-  console.log(`Node Nav 书签面板访问地址: http://localhost:${PORT}`);
+  originalLog('🚀 Node Nav 启动！');
+  originalLog(`🔗 访问地址: http://localhost:${PORT}`);
 });
